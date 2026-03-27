@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { loginWithEmail, signInWithGoogle } from "@/services/firebase";
+import { signupWithEmail, signInWithGoogle } from "@/services/firebase";
 import { useAuthStore } from "@/stores/authStore";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,15 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Heart, Loader2 } from "lucide-react";
 
-const Login = () => {
+const Signup = () => {
   const navigate = useNavigate();
   const setError = useAuthStore((s) => s.setError);
   const error = useAuthStore((s) => s.error);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<{ email?: string; password?: string }>({});
+  const [validationErrors, setValidationErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
 
   const validate = () => {
     const errors: typeof validationErrors = {};
@@ -24,6 +25,8 @@ const Login = () => {
     else if (!/\S+@\S+\.\S+/.test(email)) errors.email = "Invalid email format";
     if (!password) errors.password = "Password is required";
     else if (password.length < 6) errors.password = "Minimum 6 characters";
+    if (!confirmPassword) errors.confirmPassword = "Please confirm your password";
+    else if (password !== confirmPassword) errors.confirmPassword = "Passwords do not match";
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -34,15 +37,15 @@ const Login = () => {
     if (!validate()) return;
     setLoading(true);
     try {
-      await loginWithEmail(email, password);
+      await signupWithEmail(email, password);
       navigate("/");
     } catch (err: any) {
       const msg =
-        err.code === "auth/user-not-found" || err.code === "auth/wrong-password"
-          ? "Invalid email or password"
-          : err.code === "auth/too-many-requests"
-          ? "Too many attempts. Please try again later."
-          : "Login failed. Please try again.";
+        err.code === "auth/email-already-in-use"
+          ? "This email is already registered"
+          : err.code === "auth/weak-password"
+          ? "Password is too weak"
+          : "Sign up failed. Please try again.";
       setError(msg);
     } finally {
       setLoading(false);
@@ -70,17 +73,17 @@ const Login = () => {
             <Heart className="h-8 w-8 text-primary-foreground" />
           </div>
           <div className="text-center">
-            <h1 className="text-2xl font-bold font-['Plus_Jakarta_Sans']">Welcome to MedCore</h1>
+            <h1 className="text-2xl font-bold font-['Plus_Jakarta_Sans']">Create Account</h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Sign in to access the healthcare platform
+              Sign up to access the healthcare platform
             </p>
           </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Sign In</CardTitle>
-            <CardDescription>Enter your credentials to continue</CardDescription>
+            <CardTitle>Sign Up</CardTitle>
+            <CardDescription>Create a new account to get started</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -112,6 +115,20 @@ const Login = () => {
                 )}
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+                {validationErrors.confirmPassword && (
+                  <p className="text-xs text-destructive">{validationErrors.confirmPassword}</p>
+                )}
+              </div>
+
               {error && (
                 <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
                   {error}
@@ -122,10 +139,10 @@ const Login = () => {
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
+                    Creating account...
                   </>
                 ) : (
-                  "Sign In"
+                  "Sign Up"
                 )}
               </Button>
             </form>
@@ -155,9 +172,9 @@ const Login = () => {
             </Button>
 
             <p className="text-center text-sm text-muted-foreground mt-4">
-              Don't have an account?{" "}
-              <Link to="/signup" className="text-primary hover:underline font-medium">
-                Sign Up
+              Already have an account?{" "}
+              <Link to="/login" className="text-primary hover:underline font-medium">
+                Sign In
               </Link>
             </p>
           </CardContent>
@@ -167,4 +184,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

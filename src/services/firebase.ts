@@ -2,6 +2,9 @@ import { initializeApp } from "firebase/app";
 import {
   getAuth,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
   type User,
@@ -9,20 +12,28 @@ import {
 
 // TODO: Replace with your Firebase project configuration
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+  apiKey: "AIzaSyC1AnKnIIbAhtxWaZfmeFhI23AFqVgyT_w",
+  authDomain: "authentication-75e50.firebaseapp.com",
+  projectId: "authentication-75e50",
+  storageBucket: "authentication-75e50.firebasestorage.app",
+  messagingSenderId: "648514835846",
+  appId: "1:648514835846:web:d8cd1c8064340dcc3d0807",
+  measurementId: "G-LD7QFNJV13",
 };
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
+const googleProvider = new GoogleAuthProvider();
+
 export const loginWithEmail = (email: string, password: string) =>
   signInWithEmailAndPassword(auth, email, password);
+
+export const signupWithEmail = (email: string, password: string) =>
+  createUserWithEmailAndPassword(auth, email, password);
+
+export const signInWithGoogle = () =>
+  signInWithPopup(auth, googleProvider);
 
 export const logout = () => signOut(auth);
 
