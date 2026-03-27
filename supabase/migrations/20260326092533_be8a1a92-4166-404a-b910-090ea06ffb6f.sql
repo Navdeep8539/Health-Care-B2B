@@ -1,0 +1,1 @@
+CREATE POLICY "Anyone can delete patients" ON public.patients FOR DELETE TO anon, authenticated USING (true);
