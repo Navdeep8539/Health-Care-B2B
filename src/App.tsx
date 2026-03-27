@@ -17,7 +17,6 @@ const Login = lazy(() => import("./pages/Login"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Patients = lazy(() => import("./pages/Patients"));
-const Signup = lazy(() => import("./pages/Signup"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -48,10 +47,6 @@ const AppRoutes = () => {
         <Route
           path="/login"
           element={!loading && user ? <Navigate to="/" replace /> : <Login />}
-        />
-        <Route
-          path="/signup"
-          element={!loading && user ? <Navigate to="/" replace /> : <Signup />}
         />
         <Route
           element={
